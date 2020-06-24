@@ -20,9 +20,12 @@ while end_program == False:
     seq_A_str = (input("Enter DNA sequence A: ")).upper()
     seq_B_str = (input("Enter DNA sequence B: ")).upper()
     
-    # Main loop ender
+    # Main loop ender/bad input catcher
     if seq_A_str == "QUIT" or seq_B_str == "QUIT":
         end_program = True
+        continue
+    elif (seq_A_str.isalpha() == False) or (seq_B_str.isalpha() == False):
+        print(error)
         continue
     
     # User instructions 
@@ -67,9 +70,9 @@ Codes:
                 print(error)
                 continue
             
-            if sequence == "a":
+            if sequence == "a" and index in lengthA:
                 seq_A_str = seq_A_str[:index] + "-" + seq_A_str[index:]
-            elif sequence == "b":
+            elif sequence == "b" and index in lengthB:
                 seq_B_str = seq_B_str[:index] + "-" + seq_B_str[index:]
             else:
                 print(error)
@@ -130,13 +133,13 @@ Codes:
                 # Finding matches and mismatches    
                 if letter_A == letter_B:
                     matches += 1
-                    comp_A_str += letter_A
-                    comp_B_str += letter_B
+                    comp_A_str += letter_A.lower()
+                    comp_B_str += letter_B.lower()
                 
                 elif letter_A != letter_B:
                     mismatches += 1
-                    comp_A_str += letter_A.lower()
-                    comp_B_str += letter_B.lower()
+                    comp_A_str += letter_A
+                    comp_B_str += letter_B
                     
             print("Sequence A: " + comp_A_str + "\nSequence B: " + comp_B_str)
             print("Matches: " + str(matches) + "\nMismatches: " + str(mismatches))
