@@ -24,38 +24,29 @@ while end_program == False:
     if seq_A_str == "QUIT" or seq_B_str == "QUIT":
         end_program = True
         continue
-    elif (seq_A_str.isalpha() == False) or (seq_B_str.isalpha() == False):
-        print(error)
-        continue
     
     # User instructions 
     print("""
 Codes:
     
     "a" - Add an indel. 
-        Input in form "a(sequence)(index)"
-        Example: aB2 = Add indel on sequence B before the current index 2
-        
+
     "d" - Delete an indel
-        Input in form "d(sequence)(index)"
-        Example: aA5 = Delete indel on sequence A at index 5
         
     "s" - Score the present alignment
     
     "q" - Stop the process
-
-
               """)
               
-    print("DNA Sequence A: " + seq_A_str)
-    print("DNA Sequence B: " + seq_B_str)
     
     # SEQUENCE LOOP (AFTER USER HAS ENTERED SEQUENCES)         
     while end_alignment == False:
         
+        print("" + "\nSequence A: " + seq_A_str + "\nSequence B: " + seq_B_str)
+        
         # Variables for later use
-        lengthA = range(len(seq_A_str))
-        lengthB = range(len(seq_B_str))
+        lengthA = len(seq_A_str)
+        lengthB = len(seq_B_str)
         
         # Action input
         user_action_str = (input("Enter action desired: ")).lower()
@@ -63,34 +54,22 @@ Codes:
         
         # Add indel function
         if user_action_str[0] == "a":
-            sequence = user_action_str[1]
-            try:
-                index = int(user_action_str[2])
-            except ValueError:
-                print(error)
-                continue
+            sequence = (input("Sequence to add indel: ")).lower()
+            index = int(input("Index to add indel before: "))
             
-            if sequence == "a" and index in lengthA:
+            if sequence == "a" and index in range(lengthA):
                 seq_A_str = seq_A_str[:index] + "-" + seq_A_str[index:]
-            elif sequence == "b" and index in lengthB:
+            elif sequence == "b" and index in range(lengthB):
                 seq_B_str = seq_B_str[:index] + "-" + seq_B_str[index:]
             else:
                 print(error)
                 continue
-            
-            print("Sequence A: " + seq_A_str)
-            print("Sequence B: " + seq_B_str)
                 
         
         # Delete indel function
         elif user_action_str[0] == "d":
-            
-            sequence = user_action_str[1]
-            try:
-                index = int(user_action_str[2])
-            except ValueError:
-                print(error)
-                continue
+            sequence = (input("Sequence to delete indel: ")).lower()
+            index = int(input("Index to delete indel: "))
             
             if sequence == "a" and seq_A_str[index] == "-":
                 seq_A_str = seq_A_str[:(index)] + seq_A_str[(index+1):]
@@ -99,49 +78,39 @@ Codes:
             else:
                 print(error)
                 continue
-            
-            print("Sequence A: " + seq_A_str)
-            print("Sequence B: " + seq_B_str)
         
         # Compare sequences function
         elif user_action_str[0] == "s":
             matches = mismatches = 0
-            lengthA = range(len(seq_A_str))
-            lengthB = range(len(seq_B_str))
-            comp_A_str = comp_B_str = ""
+            comp_A_str = seq_A_str
+            comp_B_str = seq_B_str
             
             # Find the bigger sequence and set it as the range to be used
-            if lengthA[-1] > lengthB[-1]:
-                comp_range = lengthA
-            elif lengthA[-1] < lengthB[-1]:
-                comp_range = lengthB
+            # Add indels wherever needed to compensate for blanks  
+            if lengthA < lengthB:
+                comp_range = range(lengthB)
+                comp_A_str += ("-" * (lengthB - lengthA))
             else:
-                comp_range = lengthA
+                comp_range = range(lengthA)
+                comp_B_str += ("-" * (lengthA - lengthB))
+
             
             # Comparison loop 
             for i in comp_range:
-                letter_A = seq_A_str[i]
-                letter_B = seq_B_str[i]
-                
-                # Add indels wherever needed to compensate for blanks                    
-                if letter_A.isalpha() == True and letter_B == "":
-                    seq_B_str += "-"
-                    
-                elif letter_B.isalpha() == True and letter_A == "":
-                    seq_A_str += "-"
+                letter_A = comp_A_str[i]
+                letter_B = comp_B_str[i]
                 
                 # Finding matches and mismatches    
-                if letter_A == letter_B:
+                if letter_A == letter_B and (letter_A.isalpha() == letter_B.isalpha()):
                     matches += 1
-                    comp_A_str += letter_A.lower()
-                    comp_B_str += letter_B.lower()
+                    comp_A_str = comp_A_str[:i] + letter_A.lower() + comp_A_str[i+1:]
+                    comp_B_str = comp_B_str[:i] + letter_B.lower() + comp_B_str[i+1:]
                 
-                elif letter_A != letter_B:
+                else:
                     mismatches += 1
-                    comp_A_str += letter_A
-                    comp_B_str += letter_B
                     
-            print("Sequence A: " + comp_A_str + "\nSequence B: " + comp_B_str)
+                    
+            print("Compared A: " + comp_A_str + "\nCompared B: " + comp_B_str)
             print("Matches: " + str(matches) + "\nMismatches: " + str(mismatches))
         
         # Quit function
@@ -152,6 +121,7 @@ Codes:
         # Bad input
         else:
             print(error)
+            
             
         
         
