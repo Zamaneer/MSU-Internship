@@ -169,10 +169,10 @@ def replace_str(string, find, replace):
         # 2. slice old string to not include already scanned
         if index != -1: 
             temp_string += string[:index] + replace
-            string = string[index+1:]
+            string = string[index+len(find):]
             
     # Add on all elements not added at end of loop and return modified    
-    string = temp_string + string[index + len(find):]
+    string = temp_string + string
     return string
         
         
