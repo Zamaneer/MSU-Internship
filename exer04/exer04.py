@@ -212,7 +212,7 @@ def create_data(toread, towrite):
 
 
 def main():
-    create_data("data.txt", "data (copy).txt")
+    create_data("data.txt", "copyto.txt")
 
 
 
