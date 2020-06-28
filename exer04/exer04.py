@@ -18,57 +18,106 @@
 # constants
 
 
-def add_BMI(file):
-    opened_file = open(file, "a+")
-    
-    for line in opened_file:
-        line = line.strip()
-        name = line[:12].strip
-        try:
-            height= float(line[12:24].strip())
-            weight= float(line[24:36].strip())                       
-        except ValueError:
-            continue
-        
-        BMI = str(weight/height ** 2)
-        line = "{:<12s}{:<12.2f}{:<12.2f}{:<12.2f}".format(name, height, weight, BMI)
-        
-        opened_file.close()  
-        
-    return
+def add_BMI(read, write):
+    """
+    Writes previous data to specified file along with calculating BMI and
+    addng that as well. 
+    read : string
+        File to be read and copied
+    write : string
+        FIle to be written and copied to
 
-def find_avg(file):
-    opened_file = open(file, "r")
-    weight_sum = height_sum = BMI_sum = 0
+    Returns: None.
     
-    for line, text in enumerate(opened_file, 0):
-        text = text.strip()
-        
-        try:
-            height_sum += float(text[12:24].strip())
-            weight_sum += float(text[24:36].strip())
-            BMI_sum += float(text[36:48].strip())
-        except ValueError:
+    """
+    
+    opened_file = open(read, "r")
+    write_file = open(write, "w")
+    
+    
+    for index, line in enumerate(opened_file):
+        # Catches header and writes to file
+        if index == 0:
+            write_file.write("{:<12s}{:<12s}{:<12s}{:<12s}"\
+                             .format("Name", "Height(m)", "Weight(kg)", "BMI"))
             continue
         
-        entries = line
+        # Extracts height, weight, name and calculates BMI
+        line = line.strip()
+        name = line[:12].strip()
+        height = float(line[12:24].strip())
+        weight = float(line[24:36].strip())
+        
+        BMI = (weight/(height ** 2))
+        
+        
+        # Writes all parameters to file
+        line = "\n{:<12s}{:<12.2f}{:<12.2f}{:<12.2f}"\
+            .format(name, height, weight, BMI)
+        write_file.write(line)
+    
+    
+    write_file.write("\n\n")
     
     opened_file.close()
+    write_file.close()
     
-    height_average = height_sum/entries
-    weight_average = weight_sum/entries
-    BMI_average = BMI_sum/entries
+    return
+
+def add_avg(file):
+    """
+    Appends the averages of values to file
+    file : string
+        File to have averages appended to 
+
+    Returns: None
+
+    """
+    file.seek(0)
+    height_sum = weight_sum = BMI_sum = 0
+    
+    for index, line in enumerate(file):
+    # Sums up height, weight and BMI. Catches for header (ValueError)
+        line = line.strip()
+        try:
+            height_sum += float(line[12:24].strip())
+            weight_sum += float(line[24:36].strip())
+            BMI_sum += float(line[36:].strip())
+        except ValueError:
+            continue
+    
+    entries = index - 1
+    
+    # Calculation of averages
+    avg_height = height_sum/entries
+    avg_weight = weight_sum/entries
+    avg_BMI = BMI_sum/entries
+    
+    # Print averages in separate line to end of file
+    line = "\n{:<12s}{:<12.2f}{:<12.2f}{:<12.2f}"\
+        .format("Average", avg_height, avg_weight, avg_BMI)
+    file.write(line)
     
     
-    return str(height_average), str(weight_average), str(BMI_average)
+    return
 
 
 
-def find_max(file):
-    opened_file = open(file, "r")
+def add_max(file):
+    """
+    Appends the maximums of values to file
+    file : string
+        File to have maximums appended to 
+
+    Returns: None
+
+    """
+    
+    file.seek(0)
     max_height = max_weight = max_BMI = 0
     
-    for line in opened_file:
+    for line in file:
+        # Finds height, weight and BMI. Catches for header (ValueError)
         line = line.strip()
         try:
             height = float(line[12:24].strip())
@@ -77,6 +126,7 @@ def find_max(file):
         except ValueError:
             continue
         
+        # Compares finds to previous maximums, replaces if greater
         if height > max_height:
             max_height = height
         
@@ -85,15 +135,31 @@ def find_max(file):
             
         if BMI > max_BMI:
             max_BMI = BMI
-            
-    return str(max_height), str(max_weight), str(max_BMI)
+    
+    # Prints results as separate maximum line 
+    line = "\n{:<12s}{:<12.2f}{:<12.2f}{:<12.2f}"\
+        .format("Max", max_height, max_weight, max_BMI)
+    file.write(line)
+    
+    
+    return 
 
 
-def find_min(file):
-    opened_file = open(file, "r")
+def add_min(file):
+    """
+    Appends the minimums of values to file
+    file : string
+        File to have minimums appended to 
+
+    Returns: None
+
+    """
+    
+    file.seek(0)
     min_height = min_weight = min_BMI = 10**7
     
-    for line in opened_file:
+    for line in file:
+        # Finds height, weight and BMI. Catches for header (ValueError)
         line = line.strip()
         try:
             height = float(line[12:24].strip())
@@ -102,6 +168,7 @@ def find_min(file):
         except ValueError:
             continue
         
+        # Compares finds to previous minimums, replaces if less
         if height < min_height:
             min_height = height
         
@@ -110,12 +177,44 @@ def find_min(file):
             
         if BMI < min_BMI:
             min_BMI = BMI
+    
+    # Prints results as separate minimum line
+    line = "\n{:<12s}{:<12.2f}{:<12.2f}{:<12.2f}"\
+        .format("Min", min_height, min_weight, min_BMI)
+    file.write(line)
             
-    return str(min_height), str(min_weight), str(min_BMI)
-
-add_BMI("data (copy).txt")
-print(find_avg("data (copy).txt"))
-print(find_max("data (copy).txt"))
-print(find_min("data (copy).txt"))
+    return 
 
 
+def create_data(toread, towrite):
+    """
+    Strings all previous methods together and creates a new data file 
+    based on the parameters (BMI, weight, height, name)
+    toread : string
+        File to read from (for use in add_BMI)
+
+    towrite : string
+        File to write to (use in all methods)
+    
+    Returns: None
+
+    """
+    
+    add_BMI(toread, towrite)
+    
+    opened_file = open(towrite, "a+")
+    add_avg(opened_file)
+    add_max(opened_file)
+    add_min(opened_file)
+    opened_file.close()
+
+
+
+
+def main():
+    create_data("data.txt", "data (copy).txt")
+
+
+
+if __name__ == '__main__':
+    main()
