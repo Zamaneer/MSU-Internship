@@ -33,15 +33,13 @@ def find_min_percent(line):
     '''Find the min percent change in the line; return the value and the index.'''
     min_change = min_change_index= 10000.00
     
-    for n in range(0, 100, 1):
+    for n in range(0, 47, 1):
         # Sets index as a function of the first entry and column difference
-        index = 79+(12*n)
+        index = 76+(12*n)
         
-        # Breaks loop at encounter with "", or the end of the list
-        try:
-            entry = float(line[index:index+12].strip())
-        except ValueError:
-            break
+        # Formats the entry into a float with whitespace removed
+        entry = float(line[index:index+12].strip())
+
 
         # Minimum setter: Replaces minimum and records index found
         if entry < min_change:
@@ -57,14 +55,12 @@ def find_max_percent(line):
     '''Find the max percent change in the line; return the value and the index.'''
     max_change = max_change_index = 0
     
-    for n in range(0, 100, 1):
-        index = 79+(12*n)
+    for n in range(0, 47, 1):
+        index = 76+(12*n)
         
-        # Breaks loop at encounter with "", or end of list
-        try:
-            entry = float(line[index:index+12].strip())
-        except ValueError:
-            break
+        # Formats the entry into a float with whitespace removed
+        entry = float(line[index:index+12].strip())
+
         
         # Maximum setter: Replaces maximum and records index found
         if entry > max_change:
@@ -81,7 +77,6 @@ def find_gdp(line, index):
     
     # Adjusts for entry start differences in different lines
     # Returns gdp (or any parameter needed given a line and the index)
-    index -= 3
     gdp = float(line[index:index+12].strip())
     return gdp
 
