@@ -9,6 +9,8 @@
     
 # imports
 import cards
+import random
+random.seed(100)
 
 # constants
 
@@ -159,7 +161,3 @@ elif player1_card.rank() > player2_card.rank():
 else:
     print( "Player #2 wins:", player2_card, "of higher rank than", player1_card )
     
-card = player1_list.pop()
-print(card)
-card.__init__(rank = 5, suit = 4)
-print(card.rank())
