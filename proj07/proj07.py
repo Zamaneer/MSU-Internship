@@ -5,8 +5,8 @@
     #  Project #7
     #
     #     Searches news documents based on search terms provided
-    #     by user and returns relevant documents. 
-    #     News documents are in given files 
+    #     by user and returns relevant documents.
+    #     News documents are in given files
     #
     ###########################################################
 
@@ -32,46 +32,45 @@ def file_separator(file):
         List with documents separated, numbered, and with associated text
 
     '''
-    
-    # Open the file 
+
+    # Open the file
     try:
-        fp = open(file, "r" )    
-        
+        fp = open(file, "r")
+
     except IOError:
-        print( "Unable to find documents. Please check file location" )
-     
-    
+        print("Unable to find documents. Please check file location")
+
     # Separates the documents file
     # Beginning arguments
     docs_list = doc = []
     doc_counter = 0
-    doc_text = ""    
-    
+    doc_text = ""
+
     # For each line in file
     for line in fp:
         line = line.strip()
-        
+
         # If start of a new document, initialize new set, append old one
         if line == "<NEW DOCUMENT>":
             if doc_counter != 0:
                 doc.append(doc_text)
                 docs_list.append(doc)
-            
+
             doc_text = ""
             doc_counter += 1
             doc = [doc_counter]
-        
+
         # Otherwise, add the new line to the document's text
         else:
             if doc_text == "":
-                doc_text += "{}".format(line)  
+                doc_text += "{}".format(line)
             else:
                 doc_text += "\n{}".format(line)
-    
+
     # At the end of the file, add in the last document
     doc.append(doc_text)
     docs_list.append(doc)
-    
+
     return docs_list
 
 
@@ -92,24 +91,24 @@ def make_searchdict(docs_list):
 
     '''
     search_dict = dict()
-    
+
     # For each document in the document list
     for doc in docs_list:
-        
+    
         # Get the document number and split the words in the text
         doc_number = doc[0]
         doc_words = doc[1].split()
-        
+    
         # Then, for every word in the text
         for word in doc_words:
-            
+    
             # Remove carriage returns, punctuation, and capitals
             if "\n" in word:
-                word.replace("\n","")
-            
+                word.replace("\n", "")
+
             word = word.translate(str.maketrans('', '', string.punctuation))
             word = word.lower()
-            
+        
             # Add the word with doc number in dictionary if not present,
             # if present in dictionary, just add the doc number to entry
             if word in search_dict:
@@ -120,10 +119,9 @@ def make_searchdict(docs_list):
     return search_dict
 
 
-
 def match_docs(search_terms, search_dict):
     '''
-    Uses the search dictionary and looks up matches between provided 
+    Uses the search dictionary and looks up matches between provided
     search terms and documents in file. Gives back the document numbers
 
     Parameters
@@ -148,11 +146,10 @@ def match_docs(search_terms, search_dict):
     # For each search term
     for term in terms:
         
-        # Remove punctuation and lowercase 
+        # Remove punctuation and lowercase
         term = term.translate(str.maketrans('', '', string.punctuation))
         term = term.lower()
 
-        
         # If term is in the dictionary, get the set of documents it's in
         if term in search_dict:
             found_set = search_dict[term]
@@ -170,21 +167,19 @@ def match_docs(search_terms, search_dict):
     return matching_docs
 
 
-
 def main():
     
     # Initialize files and search dictionary
     docs_list = file_separator("ap_docs.txt")
     search_dict = make_searchdict(docs_list)
 
-        
-    # Program user options 
-    end = False
-    while end == False:
+    # Program user options
+    cont = True
+    while cont == True:
         
         # User menu decision
         user_decision = input("""
-What would you like to do? 
+What would you like to do?
 
 1. Search for documents
 2. Read document
@@ -206,8 +201,8 @@ What would you like to do?
             else:
                 print("No documents match your search")
           
-                
-        # Option 2: Read document        
+    
+        # Option 2: Read document
         elif user_decision == "2":
             
             # Ask for which document to read
@@ -224,15 +219,12 @@ What would you like to do?
         
         # Option 3: Quit
         elif user_decision == "3":
-            end = True
+            cont = False
         
         # Bad decision
         else:
             print("Please enter a valid input (1, 2, or 3)!")
     
-    
-    
-
 
 if __name__ == "__main__":
     main()
