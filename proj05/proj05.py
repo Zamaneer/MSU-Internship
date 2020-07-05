@@ -42,10 +42,10 @@ def open_file():
                 fp = open(yearfile_str)
                 valid_file = True
             except FileNotFoundError:
-                print("File not found! Check file location")
+                print("Error in file name: " + yearfile_str + " Please try again")
         
         else:
-            print("Please enter a year between 1990 and 2015 (inclusive)!")
+            print("Error in year. Please try again.")
             
     return fp, year_str
     
@@ -154,9 +154,8 @@ def main():
     median = find_median(data)
     
     # Print data
-    print("For the year {:4s}:".format(year))
-    print("The average income was ${:<13,.2f}".format(avg))
-    print("The median income was ${:<13,.2f}".format(median))
+    print("\n{:<4s}  {:<13s}  {:<13s}".format("Year", "Mean", "Median"))
+    print("{:4s}  ${:<13,.2f} ${:<13,.2f}".format(year, avg, median))
 
     # Ask to plot and plot
     response = input("Do you want to plot values (yes/no)? ")
@@ -176,42 +175,45 @@ def main():
          do_plot(x_vals,y_vals,year)
     
     
-    # Additional user actions
-    choice = input("Enter a choice to get (r)ange, (p)ercent, or return to stop: ")
-    
-    while choice:     
+    choice = " "
+    while choice:    
+        
+        # Additional user actions
+        choice = input("Enter a choice to get (r)ange, (p)ercent, or return to stop: ")
         
         # Choice is (r)ange, find percent incomes below level
         if choice == "r":
-            input_percent = float(input("Enter a income percent level: "))
+            input_percent = input("Enter a income percent level: ")
             
-            if 0 <= input_percent <= 100:
-                rangetofind = get_range(data, input_percent)
-                print(rangetofind)
-                rangefound = rangetofind[2]
-                print("{:4.2f}% of incomes are below ${:<13,.2f}".format(input_percent, rangefound))
+            if input_percent.isdigit() == True and 0 <= float(input_percent) <= 100:
+                    input_percent = float(input_percent)
+                    rangetofind = get_range(data, input_percent)
+                    rangefound = rangetofind[2]
+                    print("{:4.2f}% of incomes are below ${:<13,.2f}"\
+                          .format(input_percent, rangefound))
             
             else:  # If input is not a percent value
-                print("Please enter a percentage between 0 and 100!")
+                print("Error in percent. Please try again.")
             
                 
         # Choice is (p)ercent, find where income lies 
         elif choice == "p":
-            input_income = float(input("Enter an income value: "))
+            input_income = input("Enter an income value: ")
             
-            if input_income >= 0.01: 
-                percent = get_percent(data, input_income)
-                percentfound = percent[1]
-                print("An income of ${:<13,.2f} is in the top {:4.2f}% of incomes."\
-                      .format(input_income, percentfound))
+            if input_income.isdigit() == True and float(input_income) >= 0.01: 
+                    input_income = float(input_income)
+                    percent = get_percent(data, input_income)
+                    percentfound = percent[1]
+                    print("An income of ${:<13,.2f} is in the top {:4.2f}% of incomes."\
+                          .format(input_income, percentfound))
                 
             else:   # If input is not an income value
-                print("Please enter a positive income value!")
+                print("Error: Income must be positive")
          
             
         # Choice is invalid, tell and reloop
-        else:
-            print("Please enter a valid choice!")
+        elif choice != "":
+            print("Error in selection.")
             
             
             
