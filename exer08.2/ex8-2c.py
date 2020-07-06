@@ -35,6 +35,15 @@ class Time(object):
 
         return rep_str
     
+    def __str__(self):
+        
+        '''Return a human-readable string representation of a Time'''
+        
+        hum_str = "{:02d}:{:02d}:{:02d}" \
+            .format( self.__hour, self.__minute, self.__sec)
+
+        return hum_str
+    
     def from_str(self, time_str):
         
         '''Convert a string in form hh:mm:ss to a Time'''
@@ -69,50 +78,52 @@ class Time(object):
         return added_time
         
         
+def main():
+    # TIME CLASS TESTING
+    A = Time( 12, 25, 30 )
+    
+    print( A )
+    print( repr( A ) )
+    print( str( A ) )
+    print()
+    
+    B = Time( 2, 25, 3 )
+    
+    print( B )
+    print( repr( B ) )
+    print( str( B ) )
+    print()
+    
+    C = Time( 2, 25 )
+    
+    print( C )
+    print( repr( C ) )
+    print( str( C ) )
+    print()
+    
+    D = Time()
+    
+    print( D )
+    print( repr( D ) )
+    print( str( D ) )
+    print()
+    
+    D.from_str( "03:09:19" )
+    
+    print( D )
+    print( repr( D ) )
+    print( str( D ) )
+    print()
+    
+    # Demonstration of add_time method
+    E = D.add_time(B)
+    print(E)
+    print()
+    
+    F = Time(23, 59, 59)
+    G = Time(2, 59, 59)
+    H = F.add_time(G)
+    print(H)
 
-# TIME CLASS TESTING
-A = Time( 12, 25, 30 )
-
-print( A )
-print( repr( A ) )
-print( str( A ) )
-print()
-
-B = Time( 2, 25, 3 )
-
-print( B )
-print( repr( B ) )
-print( str( B ) )
-print()
-
-C = Time( 2, 25 )
-
-print( C )
-print( repr( C ) )
-print( str( C ) )
-print()
-
-D = Time()
-
-print( D )
-print( repr( D ) )
-print( str( D ) )
-print()
-
-D.from_str( "03:09:19" )
-
-print( D )
-print( repr( D ) )
-print( str( D ) )
-print()
-
-# Demonstration of add_time method
-E = D.add_time(B)
-print(E)
-print()
-
-F = Time(23, 59, 59)
-G = Time(2, 59, 59)
-H = F.add_time(G)
-print(H)
-
+if __name__ == "__main__":
+    main()
