@@ -1,11 +1,19 @@
+
+    ###########################################################
+    #  Project #8
+    #
+    #     A game of FreeCell using the Card and Deck classes
+    #
+    ###########################################################
+
+# imports
 import cards
 
-import random
-random.seed(90)
+# constants
 
 def setup():
     """
-    paramaters: None (deck can be created within this function)
+    paramaters: None
     returns:
     - a foundation (list of 4 empty lists)
     - cell (list of 4 empty lists)
@@ -14,19 +22,19 @@ def setup():
     game_deck = cards.Deck()
     game_deck.shuffle()
     
-    # Initialize tableau and create foundation and cell
+    # Initialize tableau, foundation, and cell
     tableau = [[],[],[],[],[],[],[],[]]
     foundation = [[],[],[],[]]
-    cell = [[], [], [], []]
+    cell = [[],[],[],[]]
     
-    # Creating the tableau
+    # Create the tableau with eight columns, four of 7 cards, four of 6
     column = 0
     while not game_deck.is_empty():
         tableau[column].append(game_deck.deal())
         column += 1
         if column % 8 == 0: # Resets to column 0 after column 8
             column = 0
-        
+    
     return foundation,tableau,cell
 
 
@@ -39,12 +47,18 @@ def move_to_foundation(move_from,foundation,stack,f_col):
     This function can also be used to move a card from cell to foundation
     '''
     valid_move = False
-    move_card = move_from[stack].pop()
     
-    # Handles if foundation is empty, triggers if card is an Ace (rank = 1)
-    if move_card.rank() == 1 and foundation[f_col] == []:
-        valid_move = True
-        foundation[f_col].append(move_card)
+    # Make sure that the card to be moved exists
+    if move_from[stack] != []:
+        move_card = move_from[stack][-1]
+    else:
+        return valid_move
+    
+    # If foundation is empty and the card is an Ace, put into foundation
+    if foundation[f_col] == []: # Ace is rank 1
+        if move_card.rank() == 1:
+            valid_move = True
+            foundation[f_col].append(move_from[stack].pop())
         
     # Otherwise, if foundation is not empty
     else:
@@ -52,13 +66,14 @@ def move_to_foundation(move_from,foundation,stack,f_col):
         foundation_card = foundation[f_col][-1]
         
         # If the card desired is of one greater rank and is the same suit, move
-        if move_card.rank() == foundation_card.rank() + 1 and move_card.suit() == foundation_card.suit():
+        if move_card.rank() == foundation_card.rank() + 1 and\
+            move_card.suit() == foundation_card.suit():
             valid_move = True
-            foundation[f_col].append(move_card)
+            foundation[f_col].append(move_from[stack].pop())
             
         # Otherwise, put back into the tableau/cell
         else:
-            move_from[stack].append(move_card)
+            move_from[stack].append(move_from[stack].pop())
     
     return valid_move
 
@@ -71,8 +86,9 @@ def move_to_cell(tableau,cell,t_col,c_col):
     '''
     valid_move = False
     
-    # Allow the move if the cell is empty. Append to appropriate cell list
-    if cell[c_col] == []:
+    # Allow the move if the cell is empty and tableau column is not empty. 
+    # Append to appropriate cell list
+    if cell[c_col] == [] and tableau[t_col] != []:
         valid_move = True
         cell[c_col].append(tableau[t_col].pop())
         
@@ -84,25 +100,31 @@ def move_to_tableau(tableau,cell,t_col,c_col):
     parameters: a tableau, a cell, column of tableau, a cell
     returns: Boolean (True if the move is valid, False otherwise)
     moves a card in the cell to a column of tableau
-    remember to check validity of move
     '''
     valid_move = False
+    black = (1, 4) # Clubs and spades are black (Suits 1 and 4)
+    red = (2, 3) # Diamonds and hearts are red (Suits 2 and 3)
     
-    # Checks if there is a card in the cell
+    # If there is a card in the cell
     if cell[c_col] != []:
         
-        # If the tableau column isn't empty, 
+        # And if the tableau column isn't empty, 
         if tableau[t_col] != []:
             cell_card = cell[c_col][-1]
             tableau_card = tableau[t_col][-1]
+            t_card_suit = tableau_card.suit()
+            c_card_suit = cell_card.suit()
             
-            # Check to see if the cell card is one less than the tableau card
-            # And if so, add it to the tableau column
-            if cell_card.rank() == tableau_card.rank() - 1:
-                valid_move = True
-                tableau[t_col].append(cell[c_col].pop())
+            # And the colors on the cards alternate
+            if (t_card_suit in black and c_card_suit in red)\
+                or (t_card_suit in red and c_card_suit in black):
+                    
+                # And the cell card is one less rank than the tableau card, move
+                if cell_card.rank() == tableau_card.rank() - 1:
+                    valid_move = True
+                    tableau[t_col].append(cell[c_col].pop())
                 
-        # If the tableau is empty, just add the card     
+        # Otherwise, if the tableau is empty, just add the card     
         else:
             valid_move = True
             tableau[t_col].append(cell[c_col].pop())
@@ -114,8 +136,25 @@ def is_winner(foundation):
     '''
     parameters: a foundation
     return: Boolean
+    determines if the player has won the game and gives encouraging messages
     '''
-    pass
+    suits_solved = 0
+    
+    # See how many suits are solved
+    for column in foundation:
+        if len(column) == 13:
+            suits_solved += 1
+        
+    if suits_solved == 2:
+        print("Halfway! Good work!")
+    elif suits_solved == 3:
+        print("Almost there! You're doing great!")
+    elif suits_solved == 4: 
+        print("You won!")
+        return True # Break out of the loop and end game
+    
+    return False
+    
 
 
 def move_in_tableau(tableau,t_col_source,t_col_dest):
@@ -123,9 +162,36 @@ def move_in_tableau(tableau,t_col_source,t_col_dest):
     parameters: a tableau, the source tableau column and the destination tableau column
     returns: Boolean
     move card from one tableau column to another
-    remember to check validity of move
     '''
-    pass
+    valid_move = False
+    black = (1, 4) # Clubs and spades are black (Suits 1 and 4)
+    red = (2, 3) # Diamonds and hearts are red (Suits 2 and 3)
+    
+    # If there is a card in the source column
+    if tableau[t_col_source] != []:
+        
+        # And the destination column isn't empty, 
+        if tableau[t_col_dest] != []:
+            source_card = tableau[t_col_source][-1]
+            dest_card = tableau[t_col_dest][-1]
+            t_source_suit = source_card.suit()
+            t_dest_suit = dest_card.suit()
+            
+            # And if the colors on the cards alternate
+            if (t_source_suit in black and t_dest_suit in red)\
+                or (t_source_suit in red and t_dest_suit in black):
+
+                # And if the cell card is one less than the tableau card, move
+                if source_card.rank() == dest_card.rank() - 1:
+                    valid_move = True
+                    tableau[t_col_dest].append(tableau[t_col_source].pop())
+                
+        # Otherwise, if the destination is empty, just add the card     
+        else:
+            valid_move = True
+            tableau[t_col_dest].append(tableau[t_col_source].pop())
+    
+    return valid_move
         
 
 def print_game(foundation, tableau,cell):
@@ -237,15 +303,27 @@ def play():
        
     show_help()
     while True:
-        # Uncomment this next line. It is commented out because setup doesn't do anything so printing doesn't work.
+        
+        # Print display, get user input and split into parts
         print_game(foundation, tableau, cell)
+        win = is_winner(foundation)
+        if win == True: break  # Check to see if player is winner, breaks out of the loop
         response = input("Command (type 'h' for help): ")
         response = response.strip()
         response_list = response.split()
-        if len(response_list) > 0:
+        
+        # Categorizing and error checking
+        if len(response_list) > 0: # Finds the command 
             r = response_list[0]
-            param_A = int(response_list[1]) - 1
-            param_B = int(response_list[2]) - 1
+            
+            # Find additional fields if available and process into ints
+            if len(response_list) == 3 and\
+                response_list[1].isdigit() and response_list[2].isdigit(): 
+                param_A = int(response_list[1]) - 1
+                param_B = int(response_list[2]) - 1
+                valid = True
+                
+            # Move: Tableau to foundation
             if r == 't2f':
                 if param_A in range(len(tableau)) and param_B in range(len(foundation)):
                     valid = move_to_foundation(tableau, foundation, param_A, param_B)
@@ -254,12 +332,28 @@ def play():
                     
                 if valid == False:
                     print("Invalid move!")
+                    
+            # Move: Tableau to tableau
             elif r == 't2t':
-                pass # you implement                          
-            elif r == 't2c':
-                valid = move_to_cell(tableau, cell, param_A, param_B)  
+                if param_A in range(len(tableau)) and param_B in range(len(tableau)):
+                    valid = move_in_tableau(tableau, param_A, param_B)
+                else:
+                    print("Invalid input!")
+                    
                 if valid == False:
-                    print("Invalid move!")                     
+                    print("Invalid move!")      
+                    
+            # Move: Tableau to cell
+            elif r == 't2c':
+                if param_A in range(len(tableau)) and param_B in range(len(cell)):
+                    valid = move_to_cell(tableau, cell, param_A, param_B)
+                else:
+                    print("Invalid input!")
+                    
+                if valid == False:
+                    print("Invalid move!")  
+                    
+            # Move: Cell to tableau
             elif r == 'c2t':
                 if param_A in range(len(cell)) and param_B in range(len(tableau)):
                     valid = move_to_tableau(tableau, cell, param_B, param_A)
@@ -267,7 +361,9 @@ def play():
                     print("Invalid input!")
                     
                 if valid == False:
-                    print("Invalid move!")                     
+                    print("Invalid move!")   
+                    
+            # Move: Cell to foundation
             elif r == 'c2f':
                 if param_A in range(len(cell)) and param_B in range(len(foundation)):
                     valid = move_to_foundation(cell, foundation, param_A, param_B)
@@ -275,20 +371,34 @@ def play():
                     print("Invalid input!")
 
                 if valid == False:
-                    print("Invalid move!")                        
+                    print("Invalid move!")      
+                    
+            # Quit game
             elif r == 'q':
                 break
+            
+            # Show help menu
             elif r == 'h':
                 show_help()
+                
+            # Bad input catcher if command is entered
             else:
                 print('Unknown command:',r)
+                
+        # Bad input if nothing is entered
         else:
             print("Unknown Command:",response)
+
     print('Thanks for playing')
 
-play()
 
 
+
+def main():
+    play()
+
+
+if __name__ == "__main__":
+    main()
         
     
-
